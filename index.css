@@ -1,0 +1,232 @@
+body{
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-gap: 25px;
+
+}
+div.realcenter{
+	grid-column: 1/4;
+	display: grid;
+	grid-template-columns: auto auto auto;
+}
+
+div.top{
+	grid-column: 1/4;
+	text-align: center ;
+	color:black;
+	width: 100%;
+	height: 150px;
+	border-radius: 5px;
+	background-color: #4ECDDB;
+}
+img.headicon{
+	position:relative;
+	top: 19px;
+	width: 70px;
+	height: 60px;
+	}
+img.headicon,h1.heading {
+	display: inline;
+
+	}
+div.center{
+	grid-column: 2/3;
+	height:300px;
+	background-color: #4ECDDB;
+	border:2px solid  black;
+}
+div.center{
+	display:flex;
+	justify-content: center;
+
+}
+div.errorm{
+	background-color: #EF5139;
+	position: relative;
+	top:10px;
+}
+
+label.Login,input.Login{
+	display: block;
+	position: relative;
+	top:20px;
+	margin: 20px;
+	border:0;
+	
+}
+input.Login{
+	height: 30px;
+	width:250px;
+	border-radius: 5px;
+
+}
+#Sbutton{
+	height:30px;
+	width: 100px;
+	border-radius:5px;
+	position:relative;
+	left: 200px;
+	background-color: #FFFFFF;
+
+}
+#Sbutton:hover{
+background-color: #0DC694;
+
+}
+/* end of login css---start of main*/
+body#main{
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-gap: 20px;
+
+	
+
+}
+div.sidemenu{
+	border:1px solid black;
+	width: 250px;
+	height: 600px;
+	display: flex;
+	flex-direction: column;
+	background-color: #B7B7B7;
+	position: relative;
+	left: 70px;
+	border-radius: 8px;
+	
+
+}
+div.maincenter{
+	background-color: white;
+	grid-column: 2/4;
+	position: relative;
+	left: 70px;	
+	border-radius: 8px;
+	border:1px solid black;
+	width:800px;
+
+	
+
+}
+a.sidelinks,h1#menulabel{
+	text-decoration:none;
+	color: black;
+	margin: 20px;
+	position:relative;
+	left:40px;
+	height: 10px;
+	width: 180px;
+}
+img.linkicons{
+	width: 30px;
+	height: 30px;
+	position: relative;
+	top: 8px;
+}
+/*------------stock-----------------*/
+
+input.stockseacrh{
+	position: relative;
+	border-radius: 3px;
+	left:100px;
+	top:20px;
+	width: 500px;
+	height:40px;
+}
+input.stockbtn{
+	position: relative;
+	top:20px;
+	left:100px;
+	width: 100px;
+	height:45px;
+	border:none;
+	border-radius:5px;
+	background-color: #4ECDDB;
+
+}
+input.stockbtn:hover{
+background-color: #04AF20;
+
+}
+h1.stocklable{
+	position: relative;
+	left:100px;
+
+
+}
+hr.stockbar{
+	position: relative;
+	top: 30px;
+	background-color:black;
+	height: 2px;
+	width: 700px;
+	
+
+}
+/*--------add user-----------*/
+.adduser{
+	display: block;
+	position: relative;
+	left: 100px;
+	top: 20px;
+	margin: 10px;
+}
+
+input.adduserbtn{
+	position:relative;
+	left: 500px;
+	top: 20px;
+	width: 100px;
+	height:45px;
+	border:none;
+	border-radius:5px;
+	background-color: #4ECDDB;}
+input.adduser{
+	width: 400px;
+	height: 30px;
+	border-radius: 3px;
+	border:none;
+	background-color: #C6D7DC;
+
+
+	}
+input.adduserbtn:hover{
+	background-color:#04AF20;
+}
+/*------------add stock----------------*/
+.stockinput{
+	display: block;
+	position: relative;
+	left: 200px;
+	top: 20px;
+	margin: 10px;
+}
+input.stockinput{
+	width: 400px;
+	height: 40px;
+	border-radius: 3px;
+	border:none;
+	background-color: #C6D7DC;
+}
+textarea.stockinput{
+	width: 400px;
+	height: 200px;
+	border-radius: 3px;
+	border:none;
+	background-color: #C6D7DC;
+
+}
+input.stockinputbtn{
+	position:relative;
+	left: 500px;
+	top: 20px;
+	width: 100px;
+	height:45px;
+	border:none;
+	border-radius:5px;
+	background-color: #4ECDDB;
+
+}
+input.stockinputbtn:hover{
+	background-color:#04AF20;
+
+}
