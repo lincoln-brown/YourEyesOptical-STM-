@@ -5,21 +5,24 @@
 	<title></title>
 </head>
 <body>
-	<form id="stkInput">
+	<h3 class="EnStockLable">Enter Item Information </h3>
+	<form id="stkInput" action="database.php" method="post">
 		<label class="stockinput">Item name</label>
-		<input class="stockinput" type="text" name="itemname">
-		<label class="stockinput">Description</label>
-		<textarea class="stockinput" form="stkInput" name="description"></textarea>
+		<input id="SiName" class="stockinput" type="text" name="itemname">
+		<label class="stockinput">Frame Code</label>
+		<input id="FCode"class="stockinput" name="Framecode">
+		<label class="stockinput">Frame Size</label>
+		<input id="FSize"class="stockinput" name="Framesize">
 		<label class="stockinput">Amount</label>
-		<input class="stockinput" type="number" name="amount" min='1' max='100'>
+		<input id="SAmount" class="stockinput" type="number" name="amount" min='1' max='1000'>
 		<label class="stockinput" >Cost</label>
-		<input class="stockinput" type="number" name="cost" min='1000' max='100000'>
-		<input class="stockinputbtn"type="button" name="submit" value="Submit">
+		<input id="SCost" class="stockinput" type="number" name="cost" min='1000' max='100000'>
+		<input id="stockinputbtn" class="stockinputbtn"type="submit" name="submit" value="Submit">
 		
-
-
-
-	</form>
+</form>
+<div id="submitStatus">
+	<!-- status message goes here -->
+</div>
 
 </body>
 </html>

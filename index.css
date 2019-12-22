@@ -122,7 +122,7 @@ img.linkicons{
 	position: relative;
 	top: 8px;
 }
-/*------------stock-----------------*/
+/*------------ css for stock search-----------------*/
 
 input.stockseacrh{
 	position: relative;
@@ -160,8 +160,34 @@ hr.stockbar{
 	height: 2px;
 	width: 700px;
 	
-
 }
+div.Searchresults{
+	display: flex;
+	justify-content: center;	
+	text-align: center;
+	height: 380px;
+	width: 700px;
+	border:1px solid black;
+	position: relative;
+	top:30px;
+	left :50px;
+	overflow:auto;
+}
+table #tableStockSearchResults:nth-child(even){
+	background-color: red;
+}
+table #tableStockSearchResults:nth-child(odd){
+	background-color: blue;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+table{
+	width: 100%;
+}
+
+
 /*--------add user-----------*/
 .adduser{
 	display: block;
@@ -180,7 +206,7 @@ input.adduserbtn{
 	border:none;
 	border-radius:5px;
 	background-color: #4ECDDB;}
-input.adduser{
+input.adduser,select.adduser{
 	width: 400px;
 	height: 30px;
 	border-radius: 3px;
@@ -192,6 +218,18 @@ input.adduser{
 input.adduserbtn:hover{
 	background-color:#04AF20;
 }
+div#UsubmitStatus{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	text-align: center;
+	left: 100px;
+	width: 350px;
+	height: 30px;
+	
+
+}
 /*------------add stock----------------*/
 .stockinput{
 	display: block;
@@ -200,6 +238,20 @@ input.adduserbtn:hover{
 	top: 20px;
 	margin: 10px;
 }
+.invalidstockinput{
+	display: block;
+	position: relative;
+	left: 200px;
+	top: 20px;
+	margin: 10px;
+	width: 400px;
+	height: 40px;
+	border-radius: 3px;
+	border:none;
+	background-color:red;
+
+	
+}
 input.stockinput{
 	width: 400px;
 	height: 40px;
@@ -207,13 +259,8 @@ input.stockinput{
 	border:none;
 	background-color: #C6D7DC;
 }
-textarea.stockinput{
-	width: 400px;
-	height: 200px;
-	border-radius: 3px;
-	border:none;
-	background-color: #C6D7DC;
-
+h3.EnStockLable{
+	text-align:center;
 }
 input.stockinputbtn{
 	position:relative;
@@ -229,4 +276,40 @@ input.stockinputbtn{
 input.stockinputbtn:hover{
 	background-color:#04AF20;
 
+}
+div#submitStatus{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	text-align: center;
+	left: 100px;
+	width: 350px;
+	height: 30px;
+	border-radius: 5px;
+
+
+}
+
+
+
+/*----css class used in js */
+.invalid{
+	background-color: red;
+}
+.invalidAddUser{
+	display: block;
+	position: relative;
+	left: 100px;
+	top: 20px;
+	margin: 10px;
+	width: 400px;
+	height: 30px;
+	border-radius: 3px;
+	border:none;
+	background-color: red;
+}
+
+.valid{
+	background-color: green;
 }

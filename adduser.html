@@ -5,31 +5,33 @@
 	<title></title>
 </head>
 <body>
-	<form>
+	<form method="post">
 		<label class="adduser"> First name</label>
-		<input class="adduser" type="tesx" name="Fname">
+		<input id="Fname" class="adduser" type="tesx" name="Fname">
 		<label class="adduser"> Last name</label>
-		<input class="adduser" type="text" name="Lname">
+		<input id="Lname" class="adduser" type="text" name="Lname">
 		<label class="adduser"> Email</label>
-		<input class="adduser" type="email" name="Email">
+		<input id="Email" class="adduser" type="email" name="Email">
 		<label class="adduser">Position</label>
-		<input class="adduser" list="Position" type="text" name="Position">
-		<label class="adduser"> Password</label>
-		<input class="adduser" type="password" name="password">
-		<label class="adduser"> Verify Password</label>
-		<input class="adduser" type="password" name="Vpassword">
-		<input class="adduserbtn" type="button" name="usubmit" value="Submit">
-
-		<datalist id="Position">
+		<select id="posi" class="adduser" name="Position">
 			<option>Admin</option>
 			<option>Clerk</option>
 			
-		</datalist>
 
+		</select>
+		<h6 class="adduser">Password must contain Atleast one Uppercase letter, one<br>
+		Lowercase letter, one number and  greater than 7 characters. </h6>
+		<label class="adduser"> Password</label>
+		<input id="pwd" class="adduser" type="password" name="password">
+		<label class="adduser"> Verify Password</label>
+		<input id="vpwd" class="adduser" type="password" name="Vpassword">
+		<input  class="adduserbtn" type="Submit" name="usubmit" value="Submit">
 
-
-
-	</form>
+		
+</form>
+<div id="UsubmitStatus">
+	<!--errors-->
+</div>
 
 </body>
 </html>
