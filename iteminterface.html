@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<title></title>
+</head>
+<body>
+	<div id="IFnavigation">
+	<img  class="IFheadicon" src="/icons/glasses.png">
+	<button id="IFpurchase" class="IFnavBtn">Purchase</button>
+	<button id="IFdetails" class="IFnavBtn">Details</button>
+	<button id="IFedit" class="IFnavBtn">Update Item</button>
+	</div>
+
+	<div class="Idetails">
+		<div id="iteminfo">
+
+			<div class="ilableIF" ><label>Item Id#</lable> </div>  
+			<div class="idataIF" id="itemid">  </div>
+
+
+			<div class="ilableIF" ><label>Item Name</label></div> 
+			<div class="idataIF" id="itemname"> </div>
+
+			<div class="ilableIF" ><label>Item Code</label></div> 
+			<div class="idataIF" id="itemcode"> </div>
+			<div class="ilableIF" ><label>Item Size</label></div> 
+			<div class="idataIF" id="itemsize"> </div>
+			<div class="ilableIF" ><label>In Stock</label></div> 
+			<div class="idataIF" id="AIstock"> </div>
+			<div class="ilableIF" ><label>Cost</label> </div>      
+			<div class="idataIF" id="cost"> </div>
+			<!-- data here -->	
+		</div>
+		<div id="calc">
+			<form method="post">
+				<h4 id="calcLable">Amount required</h4>
+				<input id="calcinput" type="number" name="purchaceAmount" min=1 max='999999' value="1">
+				<input id="calcbutton" type="submit" name="purchace" value="Make purchace">
+
+			</form>
+		</div>
+				
+	</div>
+
+</body>
+</html>

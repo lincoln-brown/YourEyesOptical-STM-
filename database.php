@@ -15,8 +15,31 @@ stocksearch();
 	
 }
 if($_POST['MSG']=="adduser"){
-	//echo var_dump($_POST);
 	adduser();
+}
+if($_POST['MSG']=="purchase"){
+	makepurchase();
+}
+if($_POST['MSG']=="itemdetails"){
+	itemdetails();
+}
+function itemdetails(){
+	include("dbAccess.php");
+	$ID=intval($_POST['ID']);
+	try{
+	$stmt = $pdo->prepare('SELECT * FROM Stocks WHERE id= ?');
+		$stmt->execute([$ID]);
+		$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		echo ($result[0]['id'].' '.$result[0]['itemname'].' '.$result[0]['framecode'].' '
+		.$result[0]['framesize'].' '.$result[0]['amount'].' '.$result[0]['cost'].' '
+		.$result[0]['username'].' '.$result[0]['fullname'].' ' );
+		}catch(Exception $e){
+			echo $e;
+		}
+
+
+
+
 }
 function adduser(){
 	include("dbAccess.php");
@@ -47,19 +70,26 @@ function adduser(){
 }
 function addstock(){
 	include("dbAccess.php");	
-	$SiName=filter_var(trim(htmlspecialchars($_POST['SiName']),FILTER_SANITIZE_STRING));
-	$FCode=filter_var(htmlspecialchars($_POST['FCode']),FILTER_SANITIZE_STRING);
-	$FSize=filter_var(htmlspecialchars($_POST['FSize']),FILTER_SANITIZE_STRING);
-	$SAmount=intval(trim(filter_var(htmlspecialchars($_POST['SAmount']),FILTER_SANITIZE_NUMBER_INT)));
-	$SCost=intval(trim(filter_var(htmlspecialchars($_POST['SCost']),FILTER_SANITIZE_NUMBER_INT))); 
-	$username=filter_var(htmlspecialchars($_SESSION['id']),FILTER_SANITIZE_EMAIL);
-	$Name=filter_var(htmlspecialchars($_SESSION["fullname"]),FILTER_SANITIZE_STRING); 
+	$SiName=filter_var(htmlspecialchars(trim($_POST['SiName'])),FILTER_SANITIZE_STRING);
+	$FCode=filter_var(htmlspecialchars(trim($_POST['FCode'])),FILTER_SANITIZE_STRING);
+	$FSize=filter_var(htmlspecialchars(trim($_POST['FSize'])),FILTER_SANITIZE_STRING);
+	$SAmount=intval(filter_var(htmlspecialchars(trim($_POST['SAmount'])),FILTER_SANITIZE_NUMBER_INT));
+	$SCost=intval(filter_var(htmlspecialchars(trim($_POST['SCost'])),FILTER_SANITIZE_NUMBER_INT)); 
+	$username=filter_var(htmlspecialchars(trim($_SESSION['id'])),FILTER_SANITIZE_EMAIL);
+	$Name=filter_var(htmlspecialchars(trim($_SESSION["fullname"])),FILTER_SANITIZE_STRING); 
 	try{
 		//echo ($SiName." ".$SDes." ".$SAmount."".$SCost."". $username.''.$Name) ;
+		$stmt = $pdo->prepare('SELECT * FROM Stocks WHERE framecode= ?');
+		$stmt->execute([$FCode]);
+		$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		if(sizeof($result)==0){
 
 		$stmt=$pdo->prepare("INSERT INTO Stocks(itemname,framecode,framesize,amount,cost,username,fullname)VALUES(?,?,?,?,?,?,?)");
 		$stmt->execute([$SiName,$FCode,$FSize,$SAmount,$SCost,$username,$Name]);
-		echo "success";
+		echo "success";}
+		else{
+			echo "itemfound";
+		}
 		
 
 
@@ -111,18 +141,18 @@ function stocksearch(){
 		 $stmt=$pdo->query("SELECT * FROM Stocks WHERE itemname LIKE '%$query%'");
 		 $results= $stmt->fetchAll(PDO::FETCH_ASSOC);
 		 ?>
-<table id="tableStockSearchResults">
-	<thead>
-	<tr class="head">
+<table class="tableStockSearchResults">
+	<thead>	
+		<th>Element ID</th>
 		<th>Item Name</th>
 		<th>Frame Code</th>
 		<th>Frame Size</th>
 		<th>Amount In Stock</th>
-		<th>Cost</th>
-	</tr>
+		<th>Cost</th>	
 </thead>
 	<?php foreach ($results as $row): ?>
-		<tr>
+		<tr class="iname">
+	<td><?= $row['id']." "?></td>
 	<td><?= $row['itemname']?></td>
   	<td><?= $row['framecode']?></td>
   	<td><?= $row['framesize']?></td>
@@ -139,18 +169,18 @@ function stocksearch(){
 		$stmt=$pdo->query("SELECT * FROM Stocks");
 		 $results= $stmt->fetchAll(PDO::FETCH_ASSOC);
 		 ?>
-<table id="tableStockSearchResults">
-	<thead>
-	<tr class="head">
+<table class="tableStockSearchResults">
+	<thead>	
+		<th>Element ID</th>
 		<th>Item Name</th>
 		<th>Frame Code</th>
 		<th>Frame Size</th>
 		<th>Amount In Stock</th>
-		<th>Cost</th>
-	</tr>
+		<th>Cost</th>	
 	</thead>
 	<?php foreach ($results as $row): ?>
-		<tr>
+		<tr class="iname">
+	<td><?= $row['id']." "?></td>
 	<td><?= $row['itemname']?></td>
   	<td><?= $row['framecode']?></td>
   	<td><?= $row['framesize']?></td>
@@ -163,9 +193,54 @@ function stocksearch(){
 <?php endforeach; ?>
 </table>
 <?php
-
-	
 }
+
+}
+function makepurchase(){
+	include("dbAccess.php");
+	$ID=intval($_POST['ID']);
+	$pamount=intval(filter_var(htmlspecialchars(trim($_POST['Pamount'])),FILTER_SANITIZE_NUMBER_INT));
+	
+	try{
+	$stmt = $pdo->prepare('SELECT * FROM Stocks WHERE id = ?');
+	$stmt->execute([$ID]);
+	$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	 if (intval($result[0]['amount'])>=intval($pamount)){
+	 	try{
+	 	$stmt = $pdo->prepare('UPDATE Stocks SET amount = ? WHERE id= ?');
+        $stmt->execute([intval($result[0]['amount'])-$pamount, $ID]);
+        ?><div>
+       <p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+       <hr>
+       <h6 class="receipt">Item Name</h6>
+        <?=$result[0]['itemname'];?><br>
+        <h6 class="receipt">Item Code</h6>
+        <?=$result[0]['framecode'];?><br>
+        <h6 class="receipt">Item Size</h6>
+        <?=$result[0]['framesize'];?><br>
+        <h6 class="receipt">QTY</h6>
+        <?=$pamount;?><br>
+        <h6 class="receipt">Cost</h6>
+        <?='$'.$result[0]['cost'];?><br>
+        <hr>
+        <h6 class="receipt">Total</h6>
+        <?='$'.$result[0]['cost']*$pamount;?>
+        </div>
+        <?php
+    	}catch(Exception $e){
+        	echo $e;
+        }
+
+	 }else{
+	 	echo'not enough items in stock';
+	 }
+
+
+}catch(Exception $e){
+echo $e;
+}
+
 
 }
 

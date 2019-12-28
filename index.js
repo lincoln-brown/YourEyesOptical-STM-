@@ -43,6 +43,7 @@ $.ajax({
 
 
 		}else{
+			pwd.value='';
 			Errormsg.innerHTML=data;
 		}
 	}
@@ -72,17 +73,144 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     		url:'database.php',
     		data:{ query:stockseacrhinfo.value,MSG:"stockseacrh"},
     		success: function(data){
-    			results.innerHTML=data;
-    			//alert(data);
+    			results.innerHTML=data;//retuns table 
+    			var iname=document.getElementsByClassName("iname");//iname is a class name of tr returned from the server
+    			$(".iname").hover(function(){$(this).toggleClass("hover");});// hover function for table rows
+    			$(iname).on("click",function(){
+    				var trow= $(this).text().split(" ");//.text() returns the row data as string
+    				//purchase(trow);
+    				$('.maincenter').load('iteminterface.html',function(){
+    					purchase(trow)
+    					 					
+
+    					$('#IFpurchase').click(function(){
+    						$('.Idetails').load('IFpurchase.html',function(){
+    							purchase(trow);
+    						});
+    						
+    					});
+
+    					$('#IFdetails').click(function(){
+							
+							$('.Idetails').load('IFdetails.html',function(){
+    							IFdetails(trow);
+    						});
+
+    					});
+    					$('#IFedit').click(function(){
+							alert('n/i');
+
+
+    					});
+
+
+    					
+    				});
+
+
+
+    				//alert(trow[0]);
+
+    			});//end of eventlistener for table elements
+
+    		}//end of success function
+    	});
+    }//end of on click function 
+
+    
+    function purchase(trow){//this function must only b called after iteminterface.html has been loaded into the DOM
+    	//$('.maincenter').load('iteminterface.html',function(){
+    					//var results=document.querySelector(".Idetails");
+    					
+    	var itemid=document.querySelector("#itemid");
+    	var itemname=document.querySelector("#itemname");
+    	var itemcode=document.querySelector("#itemcode");
+    	var itemsize=document.querySelector("#itemsize");
+    	var aIstock=document.querySelector("#AIstock");
+    	var cost=document.querySelector("#cost");
+    	var calcinput= document.getElementById('calcinput');
+    	var calcbutton= document.getElementById('calcbutton');
+    	var calcinputexp=/^[1-9]+[0-9]*$/;
+    	
+    	itemid.innerHTML=trow[0];
+    	itemname.innerHTML=trow[1]
+    	itemcode.innerHTML=trow[3];
+    	itemsize.innerHTML=trow[5];
+    	aIstock.innerHTML=trow[7];
+    	cost.innerHTML='$'+trow[9];
+
+    	calcbutton.onclick=function(e){
+    		e.preventDefault();
+    		if(calcinputexp.test(calcinput.value)){
+    			$.ajax({
+    				type:'POST',
+    				url:'database.php',
+    				data:{ID:trow[0],Pamount:calcinput.value,MSG:'purchase'},
+    				success:function(data){
+    					var iteminfo=document.querySelector("#iteminfo");
+    					iteminfo.innerHTML=data;
+    					calcinput.value='';
+    					calcbutton.value='Purchace Again';
+
+
+
+    				}//end of success function
+    			});//end of ajax request for purchase
+
+
+
+    		}else{//below shows if purchase feild is not validated
+    			alert('Quantity not selected');
+
+
+    		}
+
+    	}//end of onclick fo calbotton
+    	
+
+    		
+   
+    }//end of purchase function
+
+    function IFdetails(trow){
+    	var itemid=document.querySelector("#itemid");
+    	var itemname=document.querySelector("#itemname");
+    	var itemcode=document.querySelector("#itemcode");
+    	var itemsize=document.querySelector("#itemsize");
+    	var aIstock=document.querySelector("#AIstock");
+    	var cost=document.querySelector("#cost");
+    	var addedby=document.querySelector("#addedby");
+    	var addedbyemail=document.querySelector("#addedbyemail");
+    	
+    	$.ajax({
+    		type:'POST',
+    		url:'database.php',
+    		data:{ID:trow[0],MSG:'itemdetails'},
+    		success:function(data){
+    			var itemDts =data.split(" ");
+    			
+    			itemid.innerHTML=itemDts[0];
+    			itemname.innerHTML=itemDts[1];
+    			itemcode.innerHTML=itemDts[2];
+		    	itemsize.innerHTML=itemDts[3];
+		    	aIstock.innerHTML=itemDts[4];
+		    	cost.innerHTML='$'+itemDts[5];
+		    	addedbyemail.innerHTML=itemDts[6];
+		    	addedby.innerHTML=itemDts[7]+' '+itemDts[8];
+		    	
+
+
     		}
     	});
+    }//end of IFdetails function 
 
+     function IFdedit(){
+    	alert('yes sir');
+    }//end of IFedit function 
 
-
-    		//alert(stockseacrhinfo.value);
-    	}
-
-    }
+    }//end of view stock function 
+    
+   
 
 	function addStockjs(){
 				var SiName = document.getElementById('SiName');
@@ -129,6 +257,9 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 								submitStatus.classList.remove('invalid')
 								submitStatus.classList.add('valid')
 								submitStatus.innerHTML="<strong>Item Added</strong>";
+
+							}else if (data==="itemfound"){
+							submitStatus.innerHTML="<strong>This Item is already in stock, if you wish to update or remove the item please use the update item option </strong>";
 
 							}else{
 								alert(data);
