@@ -17,6 +17,8 @@
 			<div class="idataIF" id="itemcode"> </div>
 			<div class="ilableIF" ><label>Item Size</label></div> 
 			<div class="idataIF" id="itemsize"> </div>
+			<div class="ilableIF" ><label>Item Colour</label></div> 
+			<div class="idataIF" id="itemcolor"> </div>
 			<div class="ilableIF" ><label>In Stock</label></div> 
 			<div class="idataIF" id="AIstock"> </div>
 			<div class="ilableIF" ><label>Cost</label> </div>      
@@ -25,8 +27,17 @@
 		</div>
 		<div id="calc">
 			<form method="post">
-				<h4 id="calcLable">Amount required</h4>
-				<input id="calcinput" type="number" name="purchaceAmount" min=1 max='999999' value="1">
+				
+				<label class="calcLable">Customer Name</label>
+				<input id="customerName" class="calcinput" type="text" name="customer name">
+				<label class="calcLable">Customer Number</label>
+				<input id="customerNumber" class="calcinput" type="text" name="telnumber">
+				<label class="calcLable">Paid by Insurance </label>
+				<input id="paidbyinsurance"  class="calcinput" type="number" name="insurance" min="1">
+				<label class="calcLable">Paid by Cash</label>
+				<input id="paidbycash" class="calcinput" type="number" name="cash" min="1">
+				<label class="calcLable">Amount required</label>
+				<input id="purchaceAmt" class="calcinput" type="number" name="purchaceAmount" min=1 max='999999' value="1">
 				<input id="calcbutton" type="submit" name="purchace" value="Make purchace">
 
 			</form>

@@ -26,8 +26,8 @@ $.ajax({
 				stock.addEventListener('click',Stock);
 				var adduser=document.getElementById('adduser');
 				adduser.addEventListener('click',Adduser);
-				var accountinfo=document.getElementById('accountinfo');
-				accountinfo.addEventListener('click',Accountinfo);
+				var downPayments=document.getElementById('DownPayments');
+				downPayments.addEventListener('click',DownPayments);
 				var ulist=document.getElementById('ulist');
 				ulist.addEventListener('click',Ulist);
 				var comment=document.getElementById('comment');
@@ -62,8 +62,8 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 	}
 //-------------------------------------java script functions for menu functions below---------------------------------------------------------
     function viewStockjs(){// viewsStock function is by its self becasus it is used multiple times in the system.
-    	var stockseacrhbtn=document.getElementById("stockseacrh");
-    	var  stockseacrhinfo=document.getElementById("stockseacrhinfo");
+    	var stockseacrhbtn=document.getElementById("seacrh");
+    	var  stockseacrhinfo=document.getElementById("seacrhinfo");
     	var results=document.querySelector(".Searchresults");
 
     	stockseacrhbtn.onclick=function(e){
@@ -78,9 +78,8 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     			$(".iname").hover(function(){$(this).toggleClass("hover");});// hover function for table rows
     			$(iname).on("click",function(){
     				var trow= $(this).text().split(" ");//.text() returns the row data as string
-    				//purchase(trow);
     				$('.maincenter').load('iteminterface.html',function(){
-    					purchase(trow)
+    					purchase(trow);
     					 					
 
     					$('#IFpurchase').click(function(){
@@ -98,16 +97,11 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 
     					});
     					$('#IFedit').click(function(){
-							alert('n/i');
-
-
-    					});
-
-
-    					
+    						$('.Idetails').load('IFupdate.html',function(){
+    							IFupdate(trow);
+    						});
+    					});    					
     				});
-
-
 
     				//alert(trow[0]);
 
@@ -126,31 +120,73 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     	var itemname=document.querySelector("#itemname");
     	var itemcode=document.querySelector("#itemcode");
     	var itemsize=document.querySelector("#itemsize");
+    	var itemcolor=document.querySelector("#itemcolor");
     	var aIstock=document.querySelector("#AIstock");
-    	var cost=document.querySelector("#cost");
-    	var calcinput= document.getElementById('calcinput');
+    	var cost=document.querySelector("#cost");    	
+    	var customerName= document.getElementById('customerName')
+    	var customerNumber= document.getElementById('customerNumber');
+    	var paidbyinsurance= document.getElementById('paidbyinsurance');
+    	var paidbycash= document.getElementById('paidbycash');
+    	var purchaceAmt= document.getElementById('purchaceAmt');
     	var calcbutton= document.getElementById('calcbutton');
-    	var calcinputexp=/^[1-9]+[0-9]*$/;
-    	
-    	itemid.innerHTML=trow[0];
-    	itemname.innerHTML=trow[1]
-    	itemcode.innerHTML=trow[3];
-    	itemsize.innerHTML=trow[5];
-    	aIstock.innerHTML=trow[7];
-    	cost.innerHTML='$'+trow[9];
+    	var customerNameExp=/[a-zA-Z0-9]+/;
+    	var customerNumberExp=/[0-9]{3}\-[0-9]{3}\-[0-9]{4}/;
+    	var paidbyinsuranceExp=/[0-9]+/;
+    	var paidbycashExp= /[0-9]+/;
+    	var purchaceAmtExp=/^[1-9]+[0-9]*$/;
 
+    	$.ajax({
+    		type:'POST',
+    		url:'database.php',
+    		data:{ID:trow[0],MSG:'itemdetails'},
+    		success:function(data){/*the data recieved from the server is divided into two parts,size and dta
+    			  size contans the size of each data while dta contains the data which is split in to one lage array with individual charaters
+    			  the size array is used to get the start and end index of each data  which is then displyed in their respective divs 
+    			  the parseInt function isues to convert the index  from string  to int*/
+    			var itemDts =data.split("/");
+    			var size=itemDts[0].split(" ");
+    			var dta=itemDts[1].split("");
+    			var id=dta.slice(0,parseInt(size[0]));
+    			var name=dta.slice(parseInt(size[0]),parseInt(size[0])+parseInt(size[1])+1);
+    			var code=dta.slice(parseInt(size[0])+parseInt(size[1])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1);
+    			var isize=dta.slice(parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1);
+    			var st=parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1;
+
+    			var stock=dta.slice(st,st+parseInt(size[4])+1);
+    			var icost=dta.slice(st+parseInt(size[4])+1,st+parseInt(size[4])+1+parseInt(size[5])+1);
+    			var color=dta.slice(st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1,st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1+parseInt(size[8])+1)
+    			itemid.innerHTML=id.join('');
+    			itemname.innerHTML=name.join('');
+    			itemcode.innerHTML=code.join('');
+		    	itemsize.innerHTML=isize.join('');
+		    	itemcolor.innerHTML=color.join('');
+		    	aIstock.innerHTML=stock.join('');
+		    	cost.innerHTML=icost.join('');
+    		}
+    	});
+    	//-------------------What happens when thr purchase btn is clicked ------------------------
     	calcbutton.onclick=function(e){
     		e.preventDefault();
-    		if(calcinputexp.test(calcinput.value)){
+    		if(customerNameExp.test(customerName.value)&&customerNumberExp.test(customerNumber.value)
+    			&&paidbyinsuranceExp.test(paidbyinsurance.value)&&paidbycashExp.test(paidbycash.value)
+    			&&purchaceAmtExp.test(purchaceAmt.value)){
+    			customerName.classList.remove('invalid');
+    			customerNumber.classList.remove('invalid');
+    			paidbyinsurance.classList.remove('invalid'); 
+    			paidbycash.classList.remove('invalid'); 
+    			purchaceAmt.classList.remove('invalid');  
+
     			$.ajax({
     				type:'POST',
     				url:'database.php',
-    				data:{ID:trow[0],Pamount:calcinput.value,MSG:'purchase'},
+    				data:{ID:trow[0],CustomerName:customerName.value,
+    					CustomerNumber:customerNumber.value,Insurance:paidbyinsurance.value,
+    					Cash:paidbycash.value,Pamount:purchaceAmt.value,MSG:'purchase'},
     				success:function(data){
     					var iteminfo=document.querySelector("#iteminfo");
     					iteminfo.innerHTML=data;
-    					calcinput.value='';
-    					calcbutton.value='Purchace Again';
+    					purchaceAmt.value='';
+    					//calcbutton.style.display='none';
 
 
 
@@ -160,7 +196,32 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 
 
     		}else{//below shows if purchase feild is not validated
-    			alert('Quantity not selected');
+    			//alert('invalid data detected');
+    			if(customerNameExp.test(customerName.value)==false){
+    				customerName.classList.add('invalid');
+    			}else{
+    				customerName.classList.remove('invalid');
+    			}
+    			if(customerNumberExp.test(customerNumber.value)==false){
+    				customerNumber.classList.add('invalid');
+    			}else{
+    				customerNumber.classList.remove('invalid');
+    			}
+    			if(paidbyinsuranceExp.test(paidbyinsurance.value)==false){
+    				paidbyinsurance.classList.add('invalid');
+    			}else{
+    			   paidbyinsurance.classList.remove('invalid'); 				
+    			}
+    			if(paidbycashExp.test(paidbycash.value)==false){
+    				paidbycash.classList.add('invalid');
+    			}else{
+    				paidbycash.classList.remove('invalid'); 	    				
+    			}
+    			if(purchaceAmtExp.test(purchaceAmt.value)==false){
+    				purchaceAmt.classList.add('invalid');
+    			}else{
+    				purchaceAmt.classList.remove('invalid');     				
+    			}
 
 
     		}
@@ -177,6 +238,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     	var itemname=document.querySelector("#itemname");
     	var itemcode=document.querySelector("#itemcode");
     	var itemsize=document.querySelector("#itemsize");
+    	var itemcolor=document.querySelector("#itemcolor");
     	var aIstock=document.querySelector("#AIstock");
     	var cost=document.querySelector("#cost");
     	var addedby=document.querySelector("#addedby");
@@ -186,17 +248,33 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     		type:'POST',
     		url:'database.php',
     		data:{ID:trow[0],MSG:'itemdetails'},
-    		success:function(data){
-    			var itemDts =data.split(" ");
-    			
-    			itemid.innerHTML=itemDts[0];
-    			itemname.innerHTML=itemDts[1];
-    			itemcode.innerHTML=itemDts[2];
-		    	itemsize.innerHTML=itemDts[3];
-		    	aIstock.innerHTML=itemDts[4];
-		    	cost.innerHTML='$'+itemDts[5];
-		    	addedbyemail.innerHTML=itemDts[6];
-		    	addedby.innerHTML=itemDts[7]+' '+itemDts[8];
+    		success:function(data){/*the data recieved from the server is divided into two parts,size and dta
+    			  size contans the size of each data while dta contains the data which is split in to one lage array with individual charaters
+    			  the size array is used to get the start and end index of each data  which is then displyed in their respective divs 
+    			  the parseInt function isues to convert the index  from string  to int*/
+    			var itemDts =data.split("/");
+    			var size=itemDts[0].split(" ");
+    			var dta=itemDts[1].split("");
+    			var id=dta.slice(0,parseInt(size[0]));
+    			var name=dta.slice(parseInt(size[0]),parseInt(size[0])+parseInt(size[1])+1);
+    			var code=dta.slice(parseInt(size[0])+parseInt(size[1])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1);
+    			var isize=dta.slice(parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1);
+    			var st=parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1;
+
+    			var stock=dta.slice(st,st+parseInt(size[4])+1);
+    			var icost=dta.slice(st+parseInt(size[4])+1,st+parseInt(size[4])+1+parseInt(size[5])+1);
+    			var email= dta.slice(st+parseInt(size[4])+1+parseInt(size[5])+1,st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1);
+    			var addername=dta.slice(st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1,st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1);
+    			var color=dta.slice(st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1,st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1+parseInt(size[8])+1)
+    			itemid.innerHTML=id.join('');
+    			itemname.innerHTML=name.join('');
+    			itemcode.innerHTML=code.join('');
+		    	itemsize.innerHTML=isize.join('');
+		    	itemcolor.innerHTML=color.join('');
+		    	aIstock.innerHTML=stock.join('');
+		    	cost.innerHTML=icost.join('');
+		    	addedbyemail.innerHTML=email.join('');
+		    	addedby.innerHTML=addername.join('');
 		    	
 
 
@@ -204,13 +282,106 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     	});
     }//end of IFdetails function 
 
-     function IFdedit(){
-    	alert('yes sir');
+     function IFupdate(trow){
+     	var itemid=document.querySelector("#itemid");
+    	var itemname=document.querySelector("#itemname");
+    	var itemcode=document.querySelector("#itemcode");
+    	var itemsize=document.querySelector("#itemsize");
+    	var itemcolor=document.querySelector("#itemcolor");
+    	var uDstock=document.querySelector("#UDstock");
+    	var uDcost=document.querySelector("#UDcost");
+    	var updatebtn=document.getElementById('updatebtn');
+    	
+    	
+    	$.ajax({
+    		type:'POST',
+    		url:'database.php',
+    		data:{ID:trow[0],MSG:'itemdetails'},
+    		success:function(data){
+    			var itemDts =data.split("/");
+    			var size=itemDts[0].split(" ");
+    			var dta=itemDts[1].split("");
+    			var id=dta.slice(0,parseInt(size[0]));
+    			var name=dta.slice(parseInt(size[0]),parseInt(size[0])+parseInt(size[1])+1);
+    			var code=dta.slice(parseInt(size[0])+parseInt(size[1])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1);
+    			var isize=dta.slice(parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1,parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1);
+    			var st=parseInt(size[0])+parseInt(size[1])+1+parseInt(size[2])+1+parseInt(size[3])+1;
+
+    			var stock=dta.slice(st,st+parseInt(size[4])+1);
+    			var icost=dta.slice(st+parseInt(size[4])+1,st+parseInt(size[4])+1+parseInt(size[5])+1);
+    			var color=dta.slice(st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1,st+parseInt(size[4])+1+parseInt(size[5])+1+parseInt(size[6])+1+parseInt(size[7])+1+parseInt(size[8])+1)
+    			itemid.innerHTML=id.join('');
+    			itemname.innerHTML=name.join('');
+    			itemcode.innerHTML=code.join('');
+		    	itemsize.innerHTML=isize.join('');
+		    	itemcolor.innerHTML=color.join('');
+		    	uDstock.value=parseInt(stock.join(''));
+		    	uDcost.value=parseInt(icost.join(''));
+
+
+
+
+
+    			//--------------------------------------
+    			
+		    	updatebtn.onclick=function(){
+		    		$.ajax({
+		    			type:'POST',
+			    		url:'database.php',
+			    		data:{ID:trow[0],stock:uDstock.value,cost:uDcost.value,MSG:'updateitemdetails'},
+			    		success:function(data){
+			    			alert(data);
+
+			    		}//end of success function for update details
+			    	});//end of ajax call
+
+		    	} //end off on click function 	
+
+
+    		}//end of success funtion for item details used to  update items
+    	});//end of ajax call for items details
+
+
+
+
+
+
+    	
     }//end of IFedit function 
 
     }//end of view stock function 
     
-   
+   function downPayments(){
+  		var downpmtseacrhbtn=document.getElementById("seacrh");
+    	var  downpmtseacrhinfo=document.getElementById("seacrhinfo");
+    	var paymentsearchresults=document.querySelector(".Searchresults")
+    	document.getElementById("stocklable").innerHTML="Enter Customer Name";
+    	downpmtseacrhbtn.onclick=function(e){
+    		e.preventDefault();
+    		$.ajax({
+    		type:'POST',
+    		url:'database.php',
+    		data:{ query:downpmtseacrhinfo.value,MSG:"downpmtseacrhinfo"},
+    		success: function(data){
+    			paymentsearchresults.innerHTML=data;
+    			$(".iname").hover(function(){$(this).toggleClass("hover");});
+    			$(".iname").on("click",function(){
+    			var trow= $(this).text().split(" ");
+    			alert(trow);
+
+
+    			});
+
+    		}
+    	});//end of  ajax call
+
+
+
+
+    	}//end off onclick for downpmtseacrhbtn
+
+
+   }//end of down payments 
 
 	function addStockjs(){
 				var SiName = document.getElementById('SiName');
@@ -218,6 +389,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 				var FSize=document.getElementById('FSize');
 				var SAmount=document.getElementById('SAmount');
 				var SCost=document.getElementById('SCost');
+				var SColor=document.getElementById('IColor');
 				var stockinputbtn=document.getElementById('stockinputbtn');
 				var submitStatus=document.querySelector("#submitStatus");
 				var SiNameExp=/[a-zA-Z0-9]+/;
@@ -225,10 +397,11 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 				var SAmountExp=/[0-9]+/;
 				var SCostExp=/[0-9]+/;
 				var FSizeExp=/[a-zA-Z0-9]+/;
+				var SColorExp=/[a-zA-Z0-9]+/;
 
 				stockinputbtn.onclick=function(e){
 					e.preventDefault();
-				if (SiNameExp.test(SiName.value)&&FCodeExp.test(FCode.value)&&FSizeExp.test(FSize.value)&& SAmountExp.test(SAmount.value)
+				if (SColorExp.test(SColor.value)&&SiNameExp.test(SiName.value)&&FCodeExp.test(FCode.value)&&FSizeExp.test(FSize.value)&& SAmountExp.test(SAmount.value)
 					&&SCostExp.test(SCost.value)){
 					SiName.classList.remove('invalidstockinput');
 					SiName.classList.add('stockinput');
@@ -240,12 +413,14 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 					SAmount.classList.add('stockinput');
 					SCost.classList.remove('invalidstockinput');
 					SCost.classList.add('stockinput');
+					SColor.classList.remove('invalidstockinput');
+					SColor.classList.add('stockinput');
 					submitStatus.innerHTML='';
 
 					$.ajax({
 						type:'POST',
 						url:'database.php',
-						data:{SiName:SiName.value,FCode:FCode.value,FSize:FSize.value,
+						data:{SColor:SColor.value,SiName:SiName.value,FCode:FCode.value,FSize:FSize.value,
 						SAmount:SAmount.value,SCost:SCost.value,MSG:'addstock' },
 						success: function(data){
 							if (data==="success"){
@@ -254,6 +429,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 								FSize.value='';
 								SAmount.value='';
 								SCost.value='';
+								SColor.value='';
 								submitStatus.classList.remove('invalid')
 								submitStatus.classList.add('valid')
 								submitStatus.innerHTML="<strong>Item Added</strong>";
@@ -304,6 +480,14 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 					}else{
 						SCost.classList.remove('invalidstockinput');
 						SCost.classList.add('stockinput');						
+					}
+					
+					if(SColorExp.test(SColor.value)==false){
+						SColor.classList.remove('stockinput');
+						SColor.classList.add('invalidstockinput');
+					}else{
+						SColor.classList.remove('invalidstockinput');
+						SColor.classList.add('stockinput');						
 					}
 
 					
@@ -444,8 +628,9 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 		function Addstock(){
 			$('.maincenter').load('addstock.html',addStockjs)			
 		}
-		function Accountinfo(){
-		alert("Not Impemented ");
+		function DownPayments(){
+			$('.maincenter').load('stock.html',downPayments)
+		
 		}
 		function Ulist(){
 		alert("Not Impemented");
