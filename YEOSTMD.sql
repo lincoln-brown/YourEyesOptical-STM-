@@ -44,6 +44,7 @@ CREATE TABLE `Payments`(
 	`Paidbycash` int(11) NOT NULL,
 	`balance` int(11) NOT NULL,	
 	`date_of_purchase` char(35) NOT NULL,
+	`status` char(35) NOT NULL,
 	PRIMARY KEY (`id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

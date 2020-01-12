@@ -4,6 +4,7 @@ include("dbAccess.php");
 
 if ($_POST['MSG']=="validate"){
 validate_user();
+
 }
 if($_POST['MSG']=="addstock"){
 	 addstock();
@@ -28,6 +29,138 @@ if($_POST['MSG']=="downpmtseacrhinfo"){
 	paymentsearch();
 	
 }
+if($_POST['MSG']=="allpaymentdetails"){
+	allpaymentdetails();// all payments returns all the items and down payments being made by a customer
+	
+}
+if($_POST['MSG']=="downPayment"){
+	downPayment();
+	
+}
+if($_POST['MSG']=="logout"){
+	logout();
+	
+}
+
+function downPayment(){
+	include("dbAccess.php");
+	$ID=intval($_POST['ID']);
+	$Cash=intval(filter_var(htmlspecialchars(trim($_POST['Payment'])),FILTER_SANITIZE_NUMBER_INT));
+	$Name=filter_var(htmlspecialchars(trim($_SESSION["fullname"])),FILTER_SANITIZE_STRING); 
+	try{
+		$stmt = $pdo->prepare('SELECT customerNumber FROM Payments WHERE id= ?');
+		$stmt->execute([$ID]);
+		$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$tel=$result[0]['customerNumber'];
+		$stmt = $pdo->prepare('SELECT * FROM Payments WHERE customerNumber= ?');
+		$stmt->execute([$tel]);
+		$results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$lastpayment=end($results);//getting last payment for user with $tel
+		$balance=intval($lastpayment['balance'])-$Cash;//calculating new balance 
+		if ($lastpayment['status']=='OPEN'){ //IF STATUS IS OPEN then a new payment is accepted 
+
+		//inserting payment info in to payment table 
+		$stmt=$pdo->prepare("INSERT INTO Payments(customername,customerNumber,itemname,
+    	item_cost,amount_of_items,total_cost_of_items,paidbyinsurance,Paidbycash,balance,date_of_purchase,status)VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+    	$stmt->execute([$lastpayment['customername'],$lastpayment['customerNumber'],$lastpayment['itemname'],$lastpayment['item_cost'],$lastpayment['amount_of_items'],$lastpayment['total_cost_of_items'],$lastpayment['paidbyinsurance'],$Cash,$balance,date("Y-M-d"),'OPEN']);
+
+    	$stmt = $pdo->prepare('SELECT * FROM Payments WHERE customerNumber= ?');
+		$stmt->execute([$tel]);
+		$results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		//=====================================================
+		foreach ($results as $row) {
+			if ($row['status']=='CLOSED'){
+				$totalcash=0;
+			}else{
+				$totalcash=$totalcash+intval($row['Paidbycash']);
+		}
+		}
+		//-------------------------------
+		$totalpaid=$totalcash+intval($lastpayment['paidbyinsurance']);
+
+		$lastpayment=end($results);
+		if(intval($lastpayment['balance'])<=0){
+			//Updating the status if the balance is paid in full 
+			$stmt = $pdo->prepare('UPDATE Payments SET status = ? WHERE id= ?');
+			$stmt->execute(['CLOSED',$lastpayment['id']]);
+			//inserting the data in to the sales table
+
+			$stmt=$pdo->prepare("INSERT INTO Sales(soldby,amount_sold,date_of_sale,
+    	itemname,paidbyinsurance,Paidbycash,total_sale,customername,customerNumber)VALUES(?,?,?,?,?,?,?,?,?)");
+    	$stmt->execute([$Name,$lastpayment['amount_of_items'],date("Y-M-d"),$lastpayment['itemname'],$lastpayment['paidbyinsurance'],$totalcash,$totalpaid,$lastpayment['customername'],$lastpayment['customerNumber']]);
+
+
+
+			echo 'paid in full';
+		}else{
+			echo'outstanding balance is '.$lastpayment['balance'];
+		}
+	}else{
+		echo 'The current payment has already been paid in full ';
+
+	}
+
+	}catch(Exception $e){
+		echo $e;
+	}
+
+}
+function allpaymentdetails(){
+	include("dbAccess.php");
+	$ID=intval($_POST['ID']);
+	try{
+
+		$stmt = $pdo->prepare('SELECT customerNumber FROM Payments WHERE id= ?');
+		$stmt->execute([$ID]);
+		$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$tel=$result[0]['customerNumber'];
+		$stmt = $pdo->prepare('SELECT * FROM Payments WHERE customerNumber= ?');
+		$stmt->execute([$tel]);
+		$results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+				 ?>
+<table  id="paymentsdetails" >
+	<thead>	
+		<th>Customer Name</th>
+		<th>Customer Number</th>
+		<th>Item Name</th>
+		<th>Item Cost</th>
+		<th>Item Amount</th>
+		<th>Total Cost</th>
+		<th>Insur.</th>
+		<th>Cash Payment</th>
+		<th>Balance</th>
+		<th>Payment Date</th>
+		<th>Status</th>
+		
+</thead>
+	<?php foreach ($results as $row): ?>
+		<tr class="iname">
+	<td><?= $row['customername']?></td>
+  	<td><?= $row['customerNumber']?></td>
+  	<td><?= $row['itemname']?></td>
+  	<td><?= $row['item_cost']?></td>
+  	<td><?= $row['amount_of_items']?></td>
+  	<td><?= $row['total_cost_of_items']?></td>
+  	<td><?= $row['paidbyinsurance']?></td>
+  	<td><?= $row['Paidbycash']?></td>
+  	<td><?= $row['balance']?></td>
+  	<td><?= $row['date_of_purchase']?></td>
+  	<td><?= $row['status']?></td>
+ </tr>
+  	
+ 
+<?php endforeach; ?>
+</table>
+<?php
+//---------------------
+
+	}catch(Exception $e){
+			 echo $e;
+	}
+
+}
+
 function updateitemdetails(){
 	include("dbAccess.php");
 	$Cost=intval(filter_var(htmlspecialchars(trim($_POST['cost'])),FILTER_SANITIZE_NUMBER_INT));
@@ -79,7 +212,7 @@ function adduser(){
 
 		
 		$stmt=$pdo->prepare("INSERT INTO USERS(firstname,lastname,password,email,date_joined,position)VALUES(?,?,?,?,?,?)");
-		$stmt->execute([$Fname,$Lname,$pwd,$Email,date("Y-M-D"),$position]);
+		$stmt->execute([$Fname,$Lname,$pwd,$Email,date("Y-M-d"),$position]);
 		echo "success";
 	}else{
 		echo "UserAlreadyExist";
@@ -141,6 +274,7 @@ if (sizeof($result)!=0):
 			
 		$_SESSION["id"]=$email;
 		$_SESSION["fullname"] =$result[0]['firstname'].' '.$result[0]['lastname'];
+		$_SESSION['position']=$result[0]['position'];
 			
 			echo "success";
 			
@@ -309,7 +443,7 @@ function makepurchase(){
 	$stmt->execute([$ID]);
 	$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
 	
-	 if (intval($result[0]['amount'])>=intval($pamount)){
+	 if (intval($result[0]['amount'])>=intval($pamount)){//if the item is paid in full 
 	 	$total=intval($result[0]['cost'])*$pamount;
 	 	$totalpaid=$Insurance+$Cash;
 	 	if($totalpaid>=$total){
@@ -317,21 +451,61 @@ function makepurchase(){
     	$itmecost=$result[0]['cost'];
     	$stmt=$pdo->prepare("INSERT INTO Sales(soldby,amount_sold,date_of_sale,
     	itemname,paidbyinsurance,Paidbycash,total_sale,customername,customerNumber)VALUES(?,?,?,?,?,?,?,?,?)");
-    	$stmt->execute([$Name,$pamount,date("Y-M-D"),$itemname,$Insurance,$Cash,$totalpaid,$CustomerName,$CustomerNumber]);
+    	$stmt->execute([$Name,$pamount,date("Y-M-d"),$itemname,$Insurance,$Cash,$totalpaid,$CustomerName,$CustomerNumber]);
 
 
-	 		echo'paid';
+	 		//echo'paid in full';
+
+
+	 		//===============
+	 		?><head><link rel="stylesheet" type="text/css" href="index.css"> </head>
+	 		<div>
+       <p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+       <hr>
+       <h6 class="receipt">Item Name</h6>
+        <?=$result[0]['itemname'];?><br>
+        <h6 class="receipt">Item Code</h6>
+        <?=$result[0]['framecode'];?><br>
+        <h6 class="receipt">Item Size</h6>
+        <?=$result[0]['framesize'];?><br>
+        <h6 class="receipt">QTY</h6>
+        <?=$pamount;?><br>
+        <h6 class="receipt">Cost</h6>
+        <?='$'.$result[0]['cost'];?><br>
+        <hr>
+        <h6 class="receipt">Total</h6>
+        <?='$'.$result[0]['cost']*$pamount;?>
+        </div>
+        <?php
+
+
+
+
+
+	 	//insert receipt here.
 
 	 	$stmt = $pdo->prepare('UPDATE Stocks SET amount = ? WHERE id= ?');
         $stmt->execute([intval($result[0]['amount'])-$pamount, $ID]);
-    }else{
+    }else{//if the item is not paid in full
+
+    	$stmt = $pdo->prepare('SELECT * FROM Payments WHERE customerNumber=?');
+    	$stmt->execute([$CustomerNumber]);
+    	$rsl= $stmt->fetchAll(PDO::FETCH_ASSOC);
+    	if (intval(end($rsl)['balance'])<=0){
+    	 	
     	$itemname=$result[0]['itemname'];
     	$itmecost=$result[0]['cost'];
     	$balance=$total-$totalpaid;
     	$stmt=$pdo->prepare("INSERT INTO Payments(customername,customerNumber,itemname,
-    	item_cost,amount_of_items,total_cost_of_items,paidbyinsurance,Paidbycash,balance,date_of_purchase)VALUES(?,?,?,?,?,?,?,?,?,?)");
-    	$stmt->execute([$CustomerName,$CustomerNumber,$itemname,$itmecost,$pamount,$total,$Insurance,$Cash,$balance,date("Y-M-D")]);
-    	echo'downpayment';
+    	item_cost,amount_of_items,total_cost_of_items,paidbyinsurance,Paidbycash,balance,date_of_purchase,status)VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+    	$stmt->execute([$CustomerName,$CustomerNumber,$itemname,$itmecost,$pamount,$total,$Insurance,$Cash,$balance,date("Y-M-d"),'OPEN']);
+    	$stmt = $pdo->prepare('UPDATE Stocks SET amount = ? WHERE id= ?');
+        $stmt->execute([intval($result[0]['amount'])-$pamount, $ID]);
+    	echo'Downpayment Successfull';
+    	}else{
+    		echo 'Downpayment not successfull '.$CustomerName.' has an outstanding item';
+
+    	}
 
     	
 
@@ -367,6 +541,22 @@ echo $e;
 }
 
 
+}
+function logout()
+{
+    if (isset($_COOKIE[session_name()])) :
+        setcookie(session_name(), '', time() - 7000000, '/');
+        session_destroy();
+        echo "success";
+
+    endif;
+}
+function test(){
+		if ($_SESSION['position']!='Admin'){
+			echo'access denied';
+		}else{
+			echo'access granted';
+	}
 }
 
 

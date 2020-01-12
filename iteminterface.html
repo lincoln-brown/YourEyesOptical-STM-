@@ -13,6 +13,7 @@
 	</div>
 
 	<div class="Idetails">
+		<div>
 		<div id="iteminfo">
 
 			<div class="ilableIF" ><label>Item Id#</lable> </div>  
@@ -35,6 +36,9 @@
 			<div class="idataIF" id="cost"> </div>
 			<!-- data here -->	
 		</div>
+		<button id="printbtn">Print</button>
+		</div>
+
 		<div id="calc">
 			<form method="post">
 				<label class="calcLable">Customer Name</label>
@@ -44,7 +48,7 @@
 				<label class="calcLable">Paid by Insurance </label>
 				<input id="paidbyinsurance"  class="calcinput" type="number" name="insurance" min="1">
 				<label class="calcLable">Paid by Cash</label>
-				<input id="paidbycash" class="calcinput" type="number" name="cash" min="1">
+				<input id="paidbycash" class="calcinput" type="number" name="cash" min="0">
 				<label class="calcLable">Amount required</label>
 				<input id="purchaceAmt" class="calcinput" type="number" name="purchaceAmount" min=1 max='999999' value="1">
 				<input id="calcbutton" type="submit" name="purchace" value="Make purchace">

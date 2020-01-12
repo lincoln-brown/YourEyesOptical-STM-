@@ -28,12 +28,12 @@ $.ajax({
 				adduser.addEventListener('click',Adduser);
 				var downPayments=document.getElementById('DownPayments');
 				downPayments.addEventListener('click',DownPayments);
-				var ulist=document.getElementById('ulist');
-				ulist.addEventListener('click',Ulist);
+				var slist=document.getElementById('Salist');
+				slist.addEventListener('click',Salist);
 				var comment=document.getElementById('comment');
 				comment.addEventListener('click',Comment);
-				var sout=document.getElementById('sout');
-				sout.addEventListener('click',Sout);
+				var lout=document.getElementById('lout');
+				lout.addEventListener('click',Lout);
 				var addstock=document.getElementById('addstock');
 				addstock.addEventListener('click',Addstock);
 				$('.maincenter').load("stock.html",viewStockjs)
@@ -115,7 +115,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     function purchase(trow){//this function must only b called after iteminterface.html has been loaded into the DOM
     	//$('.maincenter').load('iteminterface.html',function(){
     					//var results=document.querySelector(".Idetails");
-    					
+    	var printbtn=document.querySelector("#printbtn");				
     	var itemid=document.querySelector("#itemid");
     	var itemname=document.querySelector("#itemname");
     	var itemcode=document.querySelector("#itemcode");
@@ -134,6 +134,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     	var paidbyinsuranceExp=/[0-9]+/;
     	var paidbycashExp= /[0-9]+/;
     	var purchaceAmtExp=/^[1-9]+[0-9]*$/;
+    	printbtn.style.display='none';
 
     	$.ajax({
     		type:'POST',
@@ -187,6 +188,19 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     					iteminfo.innerHTML=data;
     					purchaceAmt.value='';
     					//calcbutton.style.display='none';
+    					printbtn.style.display='block';
+    					printbtn.onclick=function(){
+
+    						 //var css='<head><link rel="stylesheet" type="text/css" href="index.css"> </head>';
+    						// var data= css+iteminfo.innerHTML;
+							  var newWin= window.open("");
+							   newWin.document.write(iteminfo.innerHTML);
+							   newWin.print();
+							   newWin.close();
+    						
+
+
+    					}
 
 
 
@@ -226,11 +240,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 
     		}
 
-    	}//end of onclick fo calbotton
-    	
-
-    		
-   
+    	}//end of onclick fo calbotton   
     }//end of purchase function
 
     function IFdetails(trow){
@@ -275,9 +285,6 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 		    	cost.innerHTML=icost.join('');
 		    	addedbyemail.innerHTML=email.join('');
 		    	addedby.innerHTML=addername.join('');
-		    	
-
-
     		}
     	});
     }//end of IFdetails function 
@@ -317,12 +324,7 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 		    	itemcolor.innerHTML=color.join('');
 		    	uDstock.value=parseInt(stock.join(''));
 		    	uDcost.value=parseInt(icost.join(''));
-
-
-
-
-
-    			//--------------------------------------
+		    	//--------------------------------------
     			
 		    	updatebtn.onclick=function(){
 		    		$.ajax({
@@ -334,19 +336,10 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 
 			    		}//end of success function for update details
 			    	});//end of ajax call
-
-		    	} //end off on click function 	
-
-
+		    	} //end off on click function 
     		}//end of success funtion for item details used to  update items
     	});//end of ajax call for items details
 
-
-
-
-
-
-    	
     }//end of IFedit function 
 
     }//end of view stock function 
@@ -367,20 +360,50 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
     			$(".iname").hover(function(){$(this).toggleClass("hover");});
     			$(".iname").on("click",function(){
     			var trow= $(this).text().split(" ");
-    			alert(trow);
+    			$('.maincenter').load('paymentdetails.html',function(){
+    				var Paymentbtn=document.getElementById('Paymentbtn');
+    				var results=document.querySelector("#pymtdts");
+			    	var CPayment=document.getElementById('CPayment');
+			    	var CPaymentExp=/^[1-9]+[0-9]*$/;
+    				$.ajax({
+			    		type:'POST',
+			    		url:'database.php',
+			    		data:{ID:trow[0],MSG:'allpaymentdetails'},
+			    		success:function(data){
+			    			results.innerHTML=data;
+			    			
+			    			
 
 
-    			});
+			    			}
+    					});//end of ajax call
+    				Paymentbtn.onclick=function(e){
+			    				e.preventDefault();
+			    				if(CPaymentExp.test(CPayment.value)){
+			    					CPayment.style.backgroundColor = "green";	
+
+			    				$.ajax({
+						    		type:'POST',
+						    		url:'database.php',
+						    		data:{ID:trow[0],Payment:CPayment.value,MSG:'downPayment'},
+						    		success:function(data){
+						    			alert(data);
+						    			CPayment.value="";
+						    			}
+			    					});//end of ejax request	
+			    					}else{//bellow shows what hapens if cpayment feild is not validated
+			    						alert('nope');
+			    						CPayment.style.backgroundColor = "red";			    		
+
+			    					}		    				
+			    			}//end of onclic for paymentbtn
+
+    			});//end of paymentdetails function and load function
+    			});//end of on function 
 
     		}
     	});//end of  ajax call
-
-
-
-
     	}//end off onclick for downpmtseacrhbtn
-
-
    }//end of down payments 
 
 	function addStockjs(){
@@ -616,7 +639,22 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 
 
 			}//end of onclick
-		}// end of  adduserjs		
+		}// end of  adduserjs	
+
+		function allsales(){
+			var salesseacrhbtn=document.getElementById("seacrh");
+	    	var  salesseacrhinfo=document.getElementById("seacrhinfo");
+	    	var salessearchresults=document.querySelector(".Searchresults")
+	    	document.getElementById("stocklable").innerHTML="Enter Sales Item ";
+	    	salesseacrhbtn.onclick=function(e){
+	    		e.preventDefault();
+
+	    	}
+
+
+
+
+		}//end of allsales function
 
 //-------------------------------------------------------------------------------------------------    
 		function Stock(){
@@ -632,14 +670,34 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 			$('.maincenter').load('stock.html',downPayments)
 		
 		}
-		function Ulist(){
-		alert("Not Impemented");
+		function Salist(){
+			$('.maincenter').load('stock.html',allsales)
 		}
+		
 		function Comment(){
-		alert("Not Impemented");
+		alert("Access Denied ");
 		}
-		function Sout(){
-		alert("Not Impemented");
+		function Lout(){
+			$.ajax({
+				type:'POST',
+				url:'database.php',
+				data:{MSG:'logout'},
+				success:function(data){
+					if (data==='success'){
+						//alert('yes');
+						location.reload();
+
+					}else{
+
+						alert(data);
+					}
+
+				}
+			});
+
+
+
+		
 		}
 
 
