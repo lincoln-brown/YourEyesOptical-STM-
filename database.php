@@ -41,6 +41,10 @@ if($_POST['MSG']=="logout"){
 	logout();
 	
 }
+if($_POST['MSG']=="salesseacrhinfo"){
+	sales();
+	
+}
 
 function downPayment(){
 	include("dbAccess.php");
@@ -88,15 +92,88 @@ function downPayment(){
 			$stmt=$pdo->prepare("INSERT INTO Sales(soldby,amount_sold,date_of_sale,
     	itemname,paidbyinsurance,Paidbycash,total_sale,customername,customerNumber)VALUES(?,?,?,?,?,?,?,?,?)");
     	$stmt->execute([$Name,$lastpayment['amount_of_items'],date("Y-M-d"),$lastpayment['itemname'],$lastpayment['paidbyinsurance'],$totalcash,$totalpaid,$lastpayment['customername'],$lastpayment['customerNumber']]);
+    	//Genterating receipt if payment is made in full.
 
+    		?><head><link rel="stylesheet" type="text/css" href="index.css"> </head>
+			<div >
+				
+				<p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+	 			<hr>
+	 			<h6 class="receipt"> Customer Name</h6>
+	        	<?=$results[0]['customername'];?><br>
+	        	<h6 class="receipt"> Customer Number</h6>
+	        	<?=$results[0]['customerNumber'];?><br>
+	        	<h6 class="receipt"> Item Name</h6>
+	        	<?=$results[0]['itemname'];?><br>
+	        	<h6 class="receipt"> Item Cost</h6>
+	        	<?=$results[0]['item_cost'];?><br>
+	        	<h6 class="receipt"> Qunatity</h6>
+	        	<?=$results[0]['amount_of_items'];?><br>
+	        	<h6 class="receipt"> Total Cost</h6>
+	        	<?=$results[0]['total_cost_of_items'];?><br>
+	        	<h6 class="receipt"> Insurance Amount </h6>
+	        	<?=$results[0]['paidbyinsurance'];?><br>
+	        	<h6 class="receipt"> Current Cash Payment  </h6>
+	        	<?=$Cash;?><br>
+	        	<h6 class="receipt"> Total Cash Payment  </h6>
+	        	<?=$totalcash;?><br>
+	        	<h6 class="receipt"> Total Payment  </h6>
+	        	<?=$totalpaid;?><br>
 
+	        	<h6 class="receipt">Balance</h6>
+	        	<?=$lastpayment['balance'];?><br>
+	        	<h6 class="receipt">Status</h6>
+	        	<?='Final Payment';?><br>
+	       
+	        
+	        <p>Keep This Receipt Safe at All Times</p>
+			
+			</div>
 
-			echo 'paid in full';
+			<?php
 		}else{
-			echo'outstanding balance is '.$lastpayment['balance'];
+			?>
+			<head><link rel="stylesheet" type="text/css" href="index.css"> </head>
+			<div >
+				
+				<p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+	 			<hr>
+	 			<h6 class="receipt"> Customer Name</h6>
+	        	<?=$results[0]['customername'];?><br>
+	        	<h6 class="receipt"> Customer Number</h6>
+	        	<?=$results[0]['customerNumber'];?><br>
+	        	<h6 class="receipt"> Item Name</h6>
+	        	<?=$results[0]['itemname'];?><br>
+	        	<h6 class="receipt"> Item Cost</h6>
+	        	<?=$results[0]['item_cost'];?><br>
+	        	<h6 class="receipt"> Qunatity</h6>
+	        	<?=$results[0]['amount_of_items'];?><br>
+	        	<h6 class="receipt"> Total Cost</h6>
+	        	<?=$results[0]['total_cost_of_items'];?><br>
+	        	<h6 class="receipt"> Insurance Amount </h6>
+	        	<?=$results[0]['paidbyinsurance'];?><br>
+	        	<h6 class="receipt"> Current Cash Payment  </h6>
+	        	<?=$Cash;?><br>
+	        	<h6 class="receipt"> Total Cash Payment  </h6>
+	        	<?=$totalcash;?><br>
+	        	<h6 class="receipt"> Total Payment  </h6>
+	        	<?=$totalpaid;?><br>
+
+	        	<h6 class="receipt">Balance</h6>
+	        	<?=$lastpayment['balance'];?><br>
+	        	<h6 class="receipt">Status</h6>
+	        	<?='Downpayment';?><br>
+	       
+	        
+	        <p>Keep This Receipt Safe at All Times</p>
+			
+			</div>
+
+			<?php
 		}
 	}else{
-		echo 'The current payment has already been paid in full ';
+		// 'The current payment has already been paid in full ';
+		echo"Closed";
 
 	}
 
@@ -357,8 +434,81 @@ function paymentsearch(){
 }
 
 }
+function sales(){
+	
+include("dbAccess.php");
+if ($_SESSION['position']!='Admin'){
 
+	echo'Access Denied';
 
+		}else{
+	
+	 $query=filter_var(trim(htmlspecialchars($_POST['query']),FILTER_SANITIZE_STRING)); 
+	if (!empty($query)){
+
+		 $stmt=$pdo->query("SELECT * FROM Sales WHERE itemname LIKE '%$query%'");
+		 $results= $stmt->fetchAll(PDO::FETCH_ASSOC);
+		 ?>
+<table class="tableStockSearchResults">
+	<thead>	
+		<th>Item Name</th>
+		<th> Seller</th>
+		<th>Amount Sold</th>
+		<th>Date Sold</th>
+		<th>Insurance</th>
+		<th>Cash</th>
+		<th>Total Cost</th>	
+</thead>
+	<?php foreach ($results as $row): ?>
+		<tr class="iname">
+	<td><?= $row['itemname']." "?></td>
+	<td><?= $row['soldby']?></td>
+  	<td><?= $row['amount_sold']?></td>
+  	<td><?= $row['date_of_sale']?></td>
+  	<td><?= $row['paidbyinsurance']?></td>
+  	<td><?= $row['Paidbycash']?></td>
+  	<td><?= $row['total_sale']?></td>
+
+ </tr>
+  	
+ 
+<?php endforeach; ?>
+</table>
+<?php
+	}else{
+		$stmt=$pdo->query("SELECT * FROM Sales");
+		 $results= $stmt->fetchAll(PDO::FETCH_ASSOC);
+		 ?>
+<table class="tableStockSearchResults">
+	<thead>	
+		<th>Item Name</th>
+		<th> Seller</th>
+		<th>Amount Sold</th>
+		<th>Date Sold</th>
+		<th>Insurance</th>
+		<th>Cash</th>
+		<th>Total Cost</th>	
+	</thead>
+	<?php foreach ($results as $row): ?>
+		<tr class="iname">
+	<td><?= $row['itemname']." "?></td>
+	<td><?= $row['soldby']?></td>
+  	<td><?= $row['amount_sold']?></td>
+  	<td><?= $row['date_of_sale']?></td>
+  	<td><?= $row['paidbyinsurance']?></td>
+  	<td><?= $row['Paidbycash']?></td>
+  	<td><?= $row['total_sale']?></td>
+
+ </tr>
+  	
+ 
+<?php endforeach; ?>
+</table>
+<?php
+}
+
+}
+}//end of  sales funtion
 
 function stocksearch(){ 
 	include("dbAccess.php");
@@ -460,7 +610,7 @@ function makepurchase(){
 	 		//===============
 	 		?><head><link rel="stylesheet" type="text/css" href="index.css"> </head>
 	 		<div>
-       <p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+       <p>Your Eyes Optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
        <hr>
        <h6 class="receipt">Item Name</h6>
         <?=$result[0]['itemname'];?><br>
@@ -473,6 +623,8 @@ function makepurchase(){
         <h6 class="receipt">Cost</h6>
         <?='$'.$result[0]['cost'];?><br>
         <hr>
+        <h6 class="receipt" >Status</h6> 
+        <?='Paid in full';?>
         <h6 class="receipt">Total</h6>
         <?='$'.$result[0]['cost']*$pamount;?>
         </div>
@@ -501,7 +653,43 @@ function makepurchase(){
     	$stmt->execute([$CustomerName,$CustomerNumber,$itemname,$itmecost,$pamount,$total,$Insurance,$Cash,$balance,date("Y-M-d"),'OPEN']);
     	$stmt = $pdo->prepare('UPDATE Stocks SET amount = ? WHERE id= ?');
         $stmt->execute([intval($result[0]['amount'])-$pamount, $ID]);
-    	echo'Downpayment Successfull';
+    	//echo'Downpayment Successfull';
+    	?><head><link rel="stylesheet" type="text/css" href="index.css"> </head>
+	 		<div class="receipt">
+	 			<p>Your eyes optical<br> Shop #2 Lee's Plaza<br>Claremont St Ann</p>
+	 			<hr>
+	 		<h6 class="receipt">Item Name</h6>
+	        <?=$result[0]['itemname'];?><br>
+	        <h6 class="receipt">Item Code</h6>
+	        <?=$result[0]['framecode'];?><br>
+	        <h6 class="receipt">Item Size</h6>
+	        <?=$result[0]['framesize'];?><br>
+	        <h6 class="receipt">QTY</h6>
+	        <?=$pamount;?><br>
+	        <h6 class="receipt">Cost</h6>
+	        <?='$'.$result[0]['cost'];?><br>
+	        <hr>
+	        <h6 class="receipt" >Status</h6> 
+	        <?='Downpayment';?><br>
+	        <h6 class="receipt">Total</h6>
+	        <?='$'.$result[0]['cost']*$pamount;?><br>
+	         <h6 class="receipt"> Amount Paid by Cash</h6>
+	        <?="$".$Cash;?><br>
+	        <h6 class="receipt"> Amount Paid by Insurance </h6>
+	        <?="$".$Insurance;?><br>
+	        <h6 class="receipt"> Total Amount Paid</h6>
+	        <?="$".$totalpaid;?><br>
+
+	        <h6 class="receipt">Balance</h6>
+	        <?="$".$balance;?><br>
+	        <p>Keep This Receipt Safe at All Times</p>
+
+	 		</div>
+        <?php
+
+
+
+
     	}else{
     		echo 'Downpayment not successfull '.$CustomerName.' has an outstanding item';
 

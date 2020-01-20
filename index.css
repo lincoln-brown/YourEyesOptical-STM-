@@ -409,6 +409,10 @@ height: 30px;
 h6.receipt{
 	display: inline;
 }
+div.receipt{
+	text-align: center;
+	
+}
 
 div#updateiteminfo,div#Alliteminfo{
 	position: relative;

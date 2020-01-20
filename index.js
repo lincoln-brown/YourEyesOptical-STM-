@@ -371,8 +371,8 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 			    		data:{ID:trow[0],MSG:'allpaymentdetails'},
 			    		success:function(data){
 			    			results.innerHTML=data;
-			    			
-			    			
+
+			    				    			
 
 
 			    			}
@@ -387,12 +387,22 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 						    		url:'database.php',
 						    		data:{ID:trow[0],Payment:CPayment.value,MSG:'downPayment'},
 						    		success:function(data){
-						    			alert(data);
-						    			CPayment.value="";
+						    			
+						    			if(data==="Closed"){
+						    				alert('The current payment has already been paid in full');
+
+
+						    			}else{
+							    			CPayment.value="";
+									    	var newWin= window.open("");
+											newWin.document.write(data);
+											newWin.print();
+											newWin.close();
+									}
 						    			}
 			    					});//end of ejax request	
 			    					}else{//bellow shows what hapens if cpayment feild is not validated
-			    						alert('nope');
+			    						
 			    						CPayment.style.backgroundColor = "red";			    		
 
 			    					}		    				
@@ -648,8 +658,18 @@ Errormsg.innerHTML="<strong> Invalid Login Format </strong>"
 	    	document.getElementById("stocklable").innerHTML="Enter Sales Item ";
 	    	salesseacrhbtn.onclick=function(e){
 	    		e.preventDefault();
+	    		$.ajax({
+		    		type:'POST',
+		    		url:'database.php',
+		    		data:{ query:salesseacrhinfo.value,MSG:"salesseacrhinfo"},
+		    		success:function(data){
+		    			salessearchresults.innerHTML=data;
 
-	    	}
+
+    					}//end of success function 
+    				});// end of ajax call 
+
+	    	}//end of onclick function
 
 
 
